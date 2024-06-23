@@ -15,6 +15,7 @@ class RedisClient {
       console.log(err);
       this.connected = false;
     });
+    console.log('Redis connected successfully')
     this.connected = true;
   }
 

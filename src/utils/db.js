@@ -10,11 +10,13 @@ class DBClient extends EventEmitter {
     this.client = new MongoClient(MONGO_URI, { useUnifiedTopology: true });
     this.client.connect()
       .then((client) => {
+        console.log('MongoDB connected successfully');
         this.db = client.db('journalhub');
         this.emit('connected');
       })
       .catch((err) => {
-        console.error(err);
+        console.error('Failed to connect to MongoDB:', err);
+        this.emit('error', err);
       });
   }
 
@@ -28,4 +30,8 @@ class DBClient extends EventEmitter {
 }
 
 const dbClient = new DBClient();
+dbClient.on('error', (err) => {
+  console.error('MongoDB Connection Error:', err);
+});
+
 export default dbClient;
