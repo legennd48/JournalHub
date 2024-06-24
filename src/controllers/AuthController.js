@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { generateToken, blacklistToken } from '../utils/jwt';
 import dbClient from '../utils/db';
 
@@ -26,7 +27,11 @@ class AuthController {
   }
 
   async logout(req, res) {
-    const token = req.header('Authorization').replace('Bearer ', '');
+    const authHeader = req.header('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).send({ message: 'Missing or invalid Authorization header' });
+}
+const token = authHeader.replace('Bearer ', '');
 
     try {
       const decoded = jwt.decode(token);

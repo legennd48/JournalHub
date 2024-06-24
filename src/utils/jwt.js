@@ -16,16 +16,12 @@ export const verifyToken = (token) => {
 };
 
 export const blacklistToken = (token, expiresIn) => {
-    return redisClient.setex(token, expiresIn, 'blacklisted');
+    return redisClient.setex(`black_${token}`, 'blacklisted', expiresIn);
 };
 
 export const isTokenBlacklisted = async (token) => {
-    return new Promise((resolve, reject) => {
-        redisClient.get(token, (err, result) => {
-            if (err) {
-                return reject(err);
-            }
-            resolve(result === 'blacklisted');
-        });
-    });
-};
+    if (await redisClient.get(`black_${token}`) === 'blacklisted') {
+        return true;
+    };
+    return false;
+    };
