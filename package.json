@@ -60,7 +60,4 @@
     "request": "^2.88.0",
     "sinon": "^7.5.0"
   }
-  "scripts": {
-  "test": "npx mocha --require @babel/register --exit"
-}
 }
