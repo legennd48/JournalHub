@@ -27,6 +27,17 @@ class RedisClient {
     return this.connected;
   }
 
+  /**
+   * Asynchronously retrieves the value associated with a given key from Redis.
+   * @param {string} key - The key to retrieve the value for.
+   * @returns {Promise<string|null>} Resolves with the retrieved value or null on error.
+   */
+  async get(key) {
+    const getPromise = promisify(this.client.get).bind(this.client);
+    return getPromise(key);
+  }
+  
+
 }
 
 /**
