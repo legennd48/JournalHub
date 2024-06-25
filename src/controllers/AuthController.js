@@ -3,51 +3,87 @@ import jwt from 'jsonwebtoken';
 import { generateToken, blacklistToken } from '../utils/jwt';
 import dbClient from '../utils/db';
 
+/**
+ * @class AuthController
+ * @classdesc Controller for handling authentication-related operations.
+ */
 class AuthController {
+    /**
+     * Handles user login.
+     * @async
+     * @method
+     * @param {Object} req - Express request object.
+     * @param {Object} res - Express response object.
+     * @returns {Promise<void>}
+     */
     async login(req, res) {
-	console.log('This Apicont(login) was called');
-    const { email, password } = req.body;
+        const { email, password } = req.body;
 
-    try {
-      const user = await dbClient.db.collection('users').findOne({ email });
-      if (!user) {
-        return res.status(400).json({ message: 'User not found' });
-      }
+        try {
+            // Find the user in the database by email
+            const user = await dbClient.db.collection('users').findOne({ email });
+            if (!user) {
+                // If user is not found, send a 400 response
+                return res.status(400).json({ message: 'User not found' });
+            }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(400).json({ message: 'Invalid credentials' });
-      }
+            // Compare provided password with the stored hashed password
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+                // If password is invalid, send a 400 response
+                return res.status(400).json({ message: 'Invalid credentials' });
+            }
 
-      const token = generateToken(user._id);
-      return res.status(200).json({ token });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Internal server error' });
+            // Generate a JWT token for the user
+            const token = generateToken(user._id);
+            // Send the token as a response
+            return res.status(200).json({ token });
+        } catch (error) {
+            // If there's an error, log it and send a 500 response
+            console.error(error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
     }
-  }
 
-  async logout(req, res) {
-    const authHeader = req.header('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).send({ message: 'Missing or invalid Authorization header' });
-}
-const token = authHeader.replace('Bearer ', '');
+    /**
+     * Handles user logout.
+     * @async
+     * @method
+     * @param {Object} req - Express request object.
+     * @param {Object} res - Express response object.
+     * @returns {Promise<void>}
+     */
+    async logout(req, res) {
+        // Get the Authorization header from the request
+        const authHeader = req.header('Authorization');
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            // If the header is missing or doesn't start with 'Bearer ', send a 401 response
+            return res.status(401).send({ message: 'Missing or invalid Authorization header' });
+        }
 
-    try {
-      const decoded = jwt.decode(token);
-      if (!decoded) {
-        return res.status(400).json({ message: 'Invalid token' });
-      }
+        // Extract the token from the header
+        const token = authHeader.replace('Bearer ', '');
 
-      const expiresIn = decoded.exp - Math.floor(Date.now() / 1000);
-      await blacklistToken(token, expiresIn);
-      return res.status(200).json({ message: 'Logout successful' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Internal server error' });
+        try {
+            // Decode the token to get its payload
+            const decoded = jwt.decode(token);
+            if (!decoded) {
+                // If the token is invalid, send a 400 response
+                return res.status(400).json({ message: 'Invalid token' });
+            }
+
+            // Calculate the time until the token expires
+            const expiresIn = decoded.exp - Math.floor(Date.now() / 1000);
+            // Blacklist the token to prevent further use
+            await blacklistToken(token, expiresIn);
+            // Send a success response
+            return res.status(200).json({ message: 'Logout successful' });
+        } catch (error) {
+            // If there's an error, log it and send a 500 response
+            console.error(error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
     }
-  }
 }
 
 module.exports = new AuthController();
