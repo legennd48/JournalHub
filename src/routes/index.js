@@ -2,12 +2,24 @@ const express = require('express');
 
 const router = express.Router();
 const AppController = require('../controllers/AppController');
+
+const AuthController = require('../controllers/AuthController');
+const { authenticate } = require('../middleware/auth');
+
+
 const UserController = require('../controllers/userController');
 const JournalEntryController = require('../controllers/journalEntryController');
 
 
+
 // Endpoint: GET /status
 router.get('/status', AppController.getStatus);
+
+
+// Auth endpoints
+router.post('/login', AuthController.login);
+router.post('/logout', authenticate, AuthController.logout);
+
 
 // Journal Entry Routes
 router.post('/JournalEntries', JournalEntryController.createJournalEntry);

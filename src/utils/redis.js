@@ -27,6 +27,28 @@ class RedisClient {
     return this.connected;
   }
 
+  /**
+   * Asynchronously retrieves the value associated with a given key from Redis.
+   * @param {string} key - The key to retrieve the value for.
+   * @returns {Promise<string|null>} Resolves with the retrieved value or null on error.
+   */
+  async get(key) {
+    const getPromise = promisify(this.client.get).bind(this.client);
+    const val = getPromise(key);
+    return val;
+  }
+  /**
+   * Asynchronously sets a key-value pair in Redis with an expiration time.
+   * @param {string} key - The key to set.
+   * @param {*} value - The value to store for the key.
+   * @param {number} duration - The expiration time in seconds.
+   * @returns {Promise<void>} Resolves when the key is set.
+   */
+  async setex(key, value, duration) {
+    const setPromise = promisify(this.client.set).bind(this.client);
+    return setPromise(key, value, 'EX', duration);
+  }
+
 }
 
 /**
