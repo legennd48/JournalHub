@@ -4,13 +4,9 @@ import routes from './routes/index';
 import dbClient from './utils/db';
 
 // Import necessary modules
-const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const userRoutes = require('./src/routes/index');
-const dbClient = require('./utils/db');
-
 
 // Load environment variables from .env file
 dotenv.config();
@@ -35,7 +31,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 // Route handling
-app.use('/api/users', userRoutes);
+app.use('/api/users', routes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
