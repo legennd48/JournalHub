@@ -4,7 +4,8 @@ import { generateToken, blacklistToken } from '../utils/jwt';
 import dbClient from '../utils/db';
 
 class AuthController {
-  async login(req, res) {
+    async login(req, res) {
+	console.log('This Apicont(login) was called');
     const { email, password } = req.body;
 
     try {
