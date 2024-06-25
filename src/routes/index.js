@@ -3,9 +3,20 @@ const express = require('express');
 const router = express.Router();
 const AppController = require('../controllers/AppController');
 const UserController = require('../controllers/userController');
+const JournalEntryController = require('../controllers/journalEntryController');
+
 
 // Endpoint: GET /status
 router.get('/status', AppController.getStatus);
+
+// Journal Entry Routes
+router.post('/JournalEntries', JournalEntryController.createJournalEntry);
+router.get('/JournalEntries/user/:userId', JournalEntryController.getJournalEntriesByUser);
+router.get('/journalEntries/:id', JournalEntryController.getJournalEntryById);
+router.put('/JournalEntries/:id', JournalEntryController.updateJournalEntry);
+router.delete('/JournalEntries/:id', JournalEntryController.deleteJournalEntry);
+
+// User management routes
 router.post('/register', UserController.register); // Route for user registration
 router.post('/login', UserController.login); // Route for user login
 router.get('/profile', UserController.getProfile); // Route for getting user profile
