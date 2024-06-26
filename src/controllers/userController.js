@@ -1,8 +1,6 @@
 // Import the User model
-const User = require('../models/user');
-// import bcrypt for password hashimh
+const User = require('../models/User');
 const bcrypt = require('bcrypt');
-// Import jwt for token generation
 const jwt = require('jsonwebtoken');
 
 // Load environment variable from .env file

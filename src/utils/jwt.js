@@ -17,10 +17,13 @@ export const generateToken = (userId) => {
  * Verifies a JWT token.
  * @function
  * @param {string} token - The JWT token to verify.
- * @returns {Object|null} The decoded token if valid, otherwise null.
+ * @returns {Object|null} The decoded token if valid and not blacklisted, otherwise null.
  */
-export const verifyToken = (token) => {
+export const verifyToken = async (token) => {
     try {
+        if (await isTokenBlacklisted(token)) {
+            return null;
+        }
         return jwt.verify(token, SECRET_KEY);
     } catch (err) {
         return null;
@@ -45,8 +48,20 @@ export const blacklistToken = (token, expiresIn) => {
  * @returns {Promise<boolean>} A promise that resolves to true if the token is blacklisted, otherwise false.
  */
 export const isTokenBlacklisted = async (token) => {
-    if (await redisClient.get(`black_${token}`) === 'blacklisted') {
-        return true;
+    const result = await redisClient.get(`black_${token}`);
+    return result === 'blacklisted';
+};
+
+/**
+ * Extracts the JWT token from the request headers.
+ * @function
+ * @param {Object} headers - The request headers.
+ * @returns {string|null} The extracted JWT token if present, otherwise null.
+ */
+export const extractToken = (headers) => {
+    const authHeader = headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        return authHeader.slice(7, authHeader.length);
     }
-    return false;
+    return null;
 };

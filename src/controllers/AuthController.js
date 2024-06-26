@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { generateToken, blacklistToken } from '../utils/jwt';
+import { generateToken, blacklistToken, extractToken } from '../utils/jwt';
 import dbClient from '../utils/db';
 
 /**
@@ -35,9 +35,9 @@ class AuthController {
             }
 
             // Generate a JWT token for the user
-            const token = generateToken(user._id);
-            // Send the token as a response
-            return res.status(200).json({ token });
+            const token = generateToken(user._id.toString());
+            // Send the token and user ID as a response
+            return res.status(200).json({ token, userId: user._id });
         } catch (error) {
             // If there's an error, log it and send a 500 response
             console.error(error);
@@ -54,16 +54,13 @@ class AuthController {
      * @returns {Promise<void>}
      */
     async logout(req, res) {
-        // Get the Authorization header from the request
-        const authHeader = req.header('Authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        // Extract the token from the header
+        const token = extractToken(req.headers);
+        if (!token) {
             // If the header is missing or doesn't start with 'Bearer ', send a 401 response
             return res.status(401).send({ message: 'Missing or invalid Authorization header' });
         }
-
-        // Extract the token from the header
-        const token = authHeader.replace('Bearer ', '');
-
+    
         try {
             // Decode the token to get its payload
             const decoded = jwt.decode(token);

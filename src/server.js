@@ -1,12 +1,9 @@
 import express from 'express';
-import cors from 'cors'; // Import the cors package
+import cors from 'cors';
 import routes from './routes/index';
 import dbClient from './utils/db';
-
-// Import necessary modules
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const dotenv = require('dotenv');
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -14,7 +11,6 @@ dotenv.config();
 // Initialize the Express app
 const app = express();
 const port = process.env.PORT || 5000;
-
 
 // Configure CORS
 const corsOptions = {
@@ -24,19 +20,12 @@ const corsOptions = {
 
 app.use(cors(corsOptions)); // Use CORS middleware
 
-
 // Middleware to parse JSON
-
 app.use(express.json());
 app.use(bodyParser.json());
 
 // Route handling
-app.use('/api/users', routes);
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+app.use('/', routes);
 
 // Start the server once the database is connected
 dbClient.on('connected', () => {
