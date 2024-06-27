@@ -32,6 +32,12 @@ module.exports = {
       {
         files: ['*.js'],
         excludedFiles: 'babel.config.js',
-      }
-    ]
+      },
+    ],
+    "rules": {
+    "linebreak-style": ["error", "windows"],  // Use "windows" for linebreaks in Windows environment
+    "consistent-return": "off",  // Disable consistent return if not needed
+    "class-methods-use-this": "off",  // Disable class methods use this if not needed
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }]  // Allow _id if used
+  }
 };

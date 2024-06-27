@@ -1,11 +1,11 @@
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const sinon = require('sinon');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const mongoose = require('mongoose');
-const User = require('../models/user');
-const server = require('../server'); // Adjust the path to your server file
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+import sinon from 'sinon';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
+import User from '../src/models/user';
+import server from '../src/server';
 
 const { expect } = chai;
 chai.use(chaiHttp);
@@ -147,3 +147,4 @@ describe('UserController', () => {
     });
   });
 });
+

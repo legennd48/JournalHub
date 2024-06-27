@@ -1,14 +1,18 @@
-// Import the User model
-const User = require('../models/User');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+// load environment variables from .env file
+import dotenv from 'dotenv';
+// Import bcrypt for password hashing
+import bcrypt from 'bcrypt';
+// Import the user model
+import User from '../models/User';
 
-// Load environment variable from .env file
-require('dotenv').config();
+// Ensure enviornment variables are loaded
+dotenv.config();
+
+// Import database
 
 // Controller to handle user operations
 class UserController {
-  // Register a new user
+  // register a new user
   async register(req, res) {
     try {
       const { name, email, password } = req.body;
@@ -22,7 +26,7 @@ class UserController {
       // hash the password before saving
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create a new user
+      // create a new user
       const user = new User({
         name,
         email,
@@ -33,35 +37,15 @@ class UserController {
       await user.save();
 
       // respond with the created user (excluding the password)
-      res.status(201).json({ user: { id: user._id, name: user.name, email: user.email, role: user.role, isPrivate: user.isPrivate } });
-    } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  }
-  
-
-  // User login
-  async login(req, res) {
-    try {
-      const { email, password } = req.body;
-
-      // find the user by email
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ error: 'Invalid email or password' });
-      }
-
-      // compare the password with the stored hash
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(400).json({ error: 'Invalid email or password' });
-      }
-
-      // Generate a JWT token
-      const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-      // Respond with the token
-      res.status(200).json({ token });
+      res.status(201).json({
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          isPrivate: user.isPrivate,
+        },
+      });
     } catch (error) {
       res.status(500).json({ error: 'Internal Server Error' });
     }
@@ -88,17 +72,21 @@ class UserController {
       const userId = req.user.id;
       const { name, email, isPrivate } = req.body;
 
-      // find the user by ID  and update the profile
-      const user = await User.findByIdAndUpdate(userId, { name, email, isPrivate }, { new: true }).select('-password');
+      // find the user by ID and update the profile
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { name, email, isPrivate },
+        { new: true },
+      ).select('-password');
 
-      // respond with the updated user profile
+      // respond with the update user profile
       res.status(200).json({ user });
     } catch (error) {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 
-  // Delete user account
+  // delete user account
   async deleteAccount(req, res) {
     try {
       const userId = req.user.id;
@@ -106,7 +94,7 @@ class UserController {
       // find the user by ID and delete the account
       await User.findByIdAndDelete(userId);
 
-      // respond with a success message
+      // respond with a sucess message
       res.status(200).json({ message: 'Account deleted successfully' });
     } catch (error) {
       res.status(500).json({ error: 'Internal Server Error' });
@@ -114,6 +102,4 @@ class UserController {
   }
 }
 
-
-// Export an instance of UserController
-module.exports = new UserController();
+export default new UserController();
