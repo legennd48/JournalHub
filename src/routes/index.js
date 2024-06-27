@@ -27,9 +27,14 @@ router.put('/JournalEntries/:id', JournalEntryController.updateJournalEntry); //
 router.delete('/JournalEntries/:id', JournalEntryController.deleteJournalEntry); // Endpoint to delete a journal entry by ID
 
 // User management routes
-router.post('/register', UserController.register); // Route for user registration
+/*router.post('/register', UserController.register); // Route for user registration
 router.get('/profile', UserController.getProfile); // Route for getting user profile
 router.put('/profile', UserController.updateProfile); // Route for updating user profile
-router.delete('/profile', UserController.deleteAccount); // Route for deleting user account
+router.delete('/profile', UserController.deleteAccount); // Route for deleting user account*/
+
+router.post('/register', UserController.register); // Route for user registration
+router.get('/profile', authenticate, UserController.getProfile); // Route for getting user profile (secured with authentication)
+router.put('/profile', authenticate, UserController.updateProfile); // Route for updating user profile (secured with authentication)
+router.delete('/profile', authenticate, UserController.deleteAccount); // Route for deleting user account
 
 module.exports = router;

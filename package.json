@@ -10,7 +10,7 @@
     "start-worker": "MONGO_URI=mongodb://localhost:27017/journalhub nodemon --exec babel-node --presets @babel/preset-env ./src/worker.js",
     "dev": "MONGO_URI=mongodb://localhost:27017/journalhub nodemon --exec babel-node --presets @babel/preset-env",
     "test": "./node_modules/.bin/mocha --require @babel/register --exit",
-    "start": "node routes/index.js"
+    "start": "node src/routes/index.js"
   },
   "author": {
     "name": "Abdulrazzaq Adewale Liasu",
