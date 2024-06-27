@@ -8,8 +8,6 @@ import User from '../models/User';
 // Ensure enviornment variables are loaded
 dotenv.config();
 
-// Import database
-
 // Controller to handle user operations
 class UserController {
   // register a new user

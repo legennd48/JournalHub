@@ -1,7 +1,7 @@
 {
   "name": "journal_hub",
   "version": "1.0.0",
-  "description": "JournalHub - A user-friendly web application for capturing and organizing your thoughts, ideas, and experiences",
+  "description": "JournalHub - A user-friendly web application for capturing and organizing your thoughts, ideas, and experiences", 
   "main": "index.js",
   "scripts": {
     "lint": "./node_modules/.bin/eslint",
