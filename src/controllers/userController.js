@@ -1,119 +1,85 @@
-// Import the User model
-const User = require('../models/User');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+import bcrypt from 'bcrypt'; // Library for hashing passwords
+import User from '../models/User'; // User model for interacting with users
 
-// Load environment variable from .env file
-require('dotenv').config();
+const saltRounds = 10; // Number of salt rounds for bcrypt hashing
 
-// Controller to handle user operations
-class UserController {
-  // Register a new user
-  async register(req, res) {
-    try {
-      const { name, email, password } = req.body;
-
-      // check if the email is already in use
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({ error: 'Email already in use' });
-      }
-
-      // hash the password before saving
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Create a new user
-      const user = new User({
-        name,
-        email,
-        password: hashedPassword,
-      });
-
-      // save the user to the database
-      await user.save();
-
-      // respond with the created user (excluding the password)
-      res.status(201).json({ user: { id: user._id, name: user.name, email: user.email, role: user.role, isPrivate: user.isPrivate } });
-    } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+// Controller function to register a new user
+async function registerUser(req, res) {
+  const { name, email, password } = req.body; // Extract name, email, and password from request body
+  try {
+    // Check if user already exists
+    const existingUser = await User.findByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists' });
     }
-  }
-  
 
-  // User login
-  async login(req, res) {
-    try {
-      const { email, password } = req.body;
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      // find the user by email
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ error: 'Invalid email or password' });
-      }
+    // Create new user instance
+    const newUser = new User({ name, email, password: hashedPassword });
+    const userId = await newUser.save(); // Save new user to the database
 
-      // compare the password with the stored hash
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(400).json({ error: 'Invalid email or password' });
-      }
-
-      // Generate a JWT token
-      const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-      // Respond with the token
-      res.status(200).json({ token });
-    } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  }
-
-  // Get user profile
-  async getProfile(req, res) {
-    try {
-      const userId = req.user.id;
-
-      // find the user by ID
-      const user = await User.findById(userId).select('-password');
-
-      // respond with the user profile
-      res.status(200).json({ user });
-    } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  }
-
-  // update user profile
-  async updateProfile(req, res) {
-    try {
-      const userId = req.user.id;
-      const { name, email, isPrivate } = req.body;
-
-      // find the user by ID  and update the profile
-      const user = await User.findByIdAndUpdate(userId, { name, email, isPrivate }, { new: true }).select('-password');
-
-      // respond with the updated user profile
-      res.status(200).json({ user });
-    } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  }
-
-  // Delete user account
-  async deleteAccount(req, res) {
-    try {
-      const userId = req.user.id;
-
-      // find the user by ID and delete the account
-      await User.findByIdAndDelete(userId);
-
-      // respond with a success message
-      res.status(200).json({ message: 'Account deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
+    res.status(201).json({ userId }); // Respond with the newly created user's ID
+  } catch (error) {
+    console.error('Error registering user:', error); // Log any errors during registration
+    res.status(500).json({ error: 'Server error' }); // Respond with a server error status
   }
 }
 
+// Controller function to fetch user profile by ID
+async function getUserProfile(req, res) {
+  const { userId } = req.params; // Extract userId from request parameters
+  try {
+    const user = await User.findById(userId); // Find user by ID in the database
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-// Export an instance of UserController
-module.exports = new UserController();
+    res.status(200).json({ user }); // Respond with the fetched user profile
+  } catch (error) {
+    console.error('Error fetching user profile:', error); // Log any errors during profile fetch
+    res.status(500).json({ error: 'Server error' }); // Respond with a server error status
+  }
+}
+
+// Controller function to update user profile by ID
+async function updateUserProfile(req, res) {
+  const { userId } = req.params; // Extract userId from request parameters
+  const newData = req.body; // Extract updated data from request body
+  try {
+    const updated = await User.update(userId, newData); // Update user data in the database
+    if (!updated) {
+      return res.status(404).json({ error: 'User not found or no changes applied' });
+    }
+
+    res.status(200).json({ message: 'User profile updated successfully' }); // Respond with success message
+  } catch (error) {
+    console.error('Error updating user profile:', error); // Log any errors during profile update
+    res.status(500).json({ error: 'Server error' }); // Respond with a server error status
+  }
+}
+
+// Controller function to delete user account by ID
+async function deleteUserAccount(req, res) {
+  const { userId } = req.params; // Extract userId from request parameters
+  try {
+    const deleted = await User.delete(userId); // Delete user from the database
+    if (!deleted) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'User account deleted successfully' }); // Respond with success message
+  } catch (error) {
+    console.error('Error deleting user account:', error); // Log any errors during account deletion
+    res.status(500).json({ error: 'Server error' }); // Respond with a server error status
+  }
+}
+
+// Export all controller functions as named exports
+export {
+  registerUser,
+  getUserProfile,
+  updateUserProfile,
+  deleteUserAccount,
+};
