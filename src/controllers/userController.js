@@ -13,38 +13,41 @@ class UserController {
   // register a new user
   async register(req, res) {
     try {
+      console.log('Request body:', req.body);
       const { name, email, password } = req.body;
 
-      // check if the email is already in use
+      // Check if the email is already in use
       const existingUser = await User.findOne({ email });
       if (existingUser) {
+        console.log('Email already in use');
         return res.status(400).json({ error: 'Email already in use' });
       }
 
-      // hash the password before saving
+      // Hash the password before saving
       const hashedPassword = await bcrypt.hash(password, 10);
+      console.log('Password hashed');
 
-      // create a new user
+      // Create a new user
       const user = new User({
         name,
         email,
         password: hashedPassword,
       });
 
-      // save the user to the database
+      // Save the user to the database
       await user.save();
+      console.log('User saved:', user);
 
-      // respond with the created user (excluding the password)
-      res.status(201).json({
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          isPrivate: user.isPrivate,
-        },
-      });
+      // Respond with the created user (excluding the password)
+      const newUser = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      };
+
+      res.status(201).json({ user: newUser });
     } catch (error) {
+      console.error('Error during registration:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
