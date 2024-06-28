@@ -33,8 +33,8 @@ router.delete('/JournalEntries/:id', JournalEntryController.deleteJournalEntry);
 
 // User services Entry routes
 router.post('/register', registerUser);
-router.get('/users/:userId', getUserProfile);
-router.put('/users/:userId', updateUserProfile);
-router.delete('/users/:userId', deleteUserAccount);
+router.get('/profile/:userId', getUserProfile);
+router.put('/profile/:userId', updateUserProfile);
+router.delete('/profile/:userId', deleteUserAccount);
 
 module.exports = router;
