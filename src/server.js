@@ -4,7 +4,6 @@ import routes from './routes/index';
 import dbClient from './utils/db';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -27,23 +26,6 @@ app.use(bodyParser.json());
 
 // Route handling
 app.use('/', routes);
-
-// MongoDB connection
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/journalhub';
-
-mongoose.connect(MONGO_URI);
-
-mongoose.connection.on('connected', () => {
-  console.log('MongoDB connected successfully');
-  // Start the server once the database is connected
-  app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-  });
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
-});
 
 // Start the server once the database is connected
 dbClient.on('connected', () => {

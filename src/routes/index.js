@@ -2,7 +2,12 @@ import express from 'express';
 import AppController from '../controllers/AppController';
 import AuthController from '../controllers/AuthController';
 import { authenticate } from '../middleware/auth';
-import UserController from '../controllers/userController';
+import {
+  registerUser,
+  getUserProfile,
+  updateUserProfile,
+  deleteUserAccount,
+} from '../controllers/userController';
 import JournalEntryController from '../controllers/journalEntryController';
 
 const router = express.Router();
@@ -27,9 +32,9 @@ router.put('/JournalEntries/:id', JournalEntryController.updateJournalEntry); //
 router.delete('/JournalEntries/:id', JournalEntryController.deleteJournalEntry); // Endpoint to delete a journal entry by ID
 
 // User services Entry routes
-router.post('/register', UserController.register); // Route for user registration
-router.get('/profile', authenticate, UserController.getProfile); // Route for getting user profile (secured with authentication)
-router.put('/profile', authenticate, UserController.updateProfile); // Route for updating user profile (secured with authentication)
-router.delete('/profile', authenticate, UserController.deleteAccount); // Route for deleting user account
+router.post('/register', registerUser);
+router.get('/users/:userId', getUserProfile);
+router.put('/users/:userId', updateUserProfile);
+router.delete('/users/:userId', deleteUserAccount);
 
 module.exports = router;
