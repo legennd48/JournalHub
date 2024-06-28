@@ -30,10 +30,8 @@ app.use('/', routes);
 
 // MongoDB connection
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/journalhub';
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+
+mongoose.connect(MONGO_URI);
 
 mongoose.connection.on('connected', () => {
   console.log('MongoDB connected successfully');
