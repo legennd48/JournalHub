@@ -14,7 +14,6 @@ class User {
     isPrivate = false,
   }) {
     // Generate a new ObjectID for user identification
-    this.id = dbClient.ObjectID();
     this.name = name; // User's name
     this.email = email; // User's email
     this.password = password; // User's hashed password
