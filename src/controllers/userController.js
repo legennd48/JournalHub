@@ -18,8 +18,7 @@ async function registerUser(req, res) {
 
     // Create new user instance
     const newUser = new User({ name, email, password: hashedPassword });
-    const result = await newUser.save(); // Save new user to the database
-    const userId = result.insertedId;
+    const userId = await newUser.save(); // Save new user to the database
 
     res.status(201).json({ userId }); // Respond with the newly created user's ID
   } catch (error) {
