@@ -11,7 +11,7 @@ class User {
     email,
     password,
     role = 'user',
-    isPrivate = false,
+    isPrivate = true,
   }) {
     // Generate a new ObjectID for user identification
     this.name = name; // User's name
