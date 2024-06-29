@@ -36,11 +36,6 @@ async function getUserProfile(req, res) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Check if the profile is private
-    if (user.isPrivate) {
-      return res.status(403).json({ error: 'This profile is private' });
-    }
-
     res.status(200).json({ user }); // Respond with the fetched user profile
   } catch (error) {
     console.error('Error fetching user profile:', error); // Log any errors during profile fetch
