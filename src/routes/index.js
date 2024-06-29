@@ -33,8 +33,8 @@ router.delete('/JournalEntries/:id', JournalEntryController.deleteJournalEntry);
 
 // User services Entry routes
 router.post('/register', registerUser);
-router.get('/profile/:userId', getUserProfile);
-router.put('/profile/:userId', updateUserProfile);
-router.delete('/profile/:userId', deleteUserAccount);
+router.get('/profile/:userId', authenticate, getUserProfile); // Add authenticate middleware
+router.put('/profile/:userId', authenticate, updateUserProfile); // Add authenticate middleware
+router.delete('/profile/:userId', authenticate, deleteUserAccount); // Add authenticate middleware
 
 module.exports = router;
