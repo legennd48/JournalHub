@@ -2,7 +2,12 @@ import express from 'express';
 import AppController from '../controllers/AppController';
 import AuthController from '../controllers/AuthController';
 import { authenticate } from '../middleware/auth';
-import UserController from '../controllers/userController';
+import {
+  registerUser,
+  getUserProfile,
+  updateUserProfile,
+  deleteUserAccount,
+} from '../controllers/userController';
 import JournalEntryController from '../controllers/journalEntryController';
 
 const router = express.Router();
@@ -14,6 +19,8 @@ const router = express.Router();
 
 // Endpoint: GET /status
 router.get('/status', AppController.getStatus); // Endpoint to check the status of the application
+router.get('/stats', (req, res) => AppController.getStats(req, res));
+router.get('/user/entries/:id', (req, res) => AppController.getUserEntries(req, res));
 
 // Auth endpoints
 router.post('/login', AuthController.login); // Endpoint to handle user login
@@ -26,10 +33,10 @@ router.get('/journalEntries/:id', JournalEntryController.getJournalEntryById); /
 router.put('/JournalEntries/:id', JournalEntryController.updateJournalEntry); // Endpoint to update a journal entry by ID
 router.delete('/JournalEntries/:id', JournalEntryController.deleteJournalEntry); // Endpoint to delete a journal entry by ID
 
-// User management routes
-router.post('/register', UserController.register); // Route for user registration
-router.get('/profile', UserController.getProfile); // Route for getting user profile
-router.put('/profile', UserController.updateProfile); // Route for updating user profile
-router.delete('/profile', UserController.deleteAccount); // Route for deleting user account
+// User services Entry routes
+router.post('/register', registerUser);
+router.get('/profile/:userId', authenticate, getUserProfile); // Add authenticate middleware
+router.put('/profile/:userId', authenticate, updateUserProfile); // Add authenticate middleware
+router.delete('/profile/:userId', authenticate, deleteUserAccount); // Add authenticate middleware
 
-module.exports = router;
+export default router;

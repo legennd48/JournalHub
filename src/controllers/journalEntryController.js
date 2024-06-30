@@ -1,16 +1,37 @@
 import JournalEntry from '../models/JournalEntry';
+import { verifyToken, extractToken } from '../utils/jwt';
 
+/**
+ * Controller class for handling journal entry operations.
+ */
 class JournalEntryController {
   /**
    * Create a new journal entry.
    * @param {Object} req - The request object.
    * @param {Object} res - The response object.
-   * @returns {Object} The created journal entry.
+   * @returns {Promise<Object>} The created journal entry.
    */
   static async createJournalEntry(req, res) {
     try {
-      const { title, content, authorId } = req.body;
-      const newEntry = await JournalEntry.createJournalEntry(title, content, authorId);
+      const token = extractToken(req.headers);
+      if (!token) {
+        return res.status(401).json({ error: 'Invalid token' });
+      }
+
+      const decoded = await verifyToken(token);
+      if (!decoded) {
+        return res.status(401).json({ error: 'Invalid token' });
+      }
+
+      const authorId = req.headers['userid']; // Corrected to 'userid' instead of 'userId'
+      if (!authorId || authorId !== decoded.userId) {
+        return res.status(401).json({ error: 'Invalid authorId' });
+      }
+
+      const { date, title, content } = req.body;
+      const createdAt = date ? new Date(date) : new Date();
+      const newEntry = await JournalEntry.createJournalEntry(title, content, authorId, createdAt);
+
       res.status(201).json(newEntry);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -21,11 +42,16 @@ class JournalEntryController {
    * Retrieve all journal entries associated with a specific user.
    * @param {Object} req - The request object.
    * @param {Object} res - The response object.
-   * @returns {Array} The list of journal entries.
+   * @returns {Promise<Array>} The list of journal entries.
    */
   static async getJournalEntriesByUser(req, res) {
     try {
-      const entries = await JournalEntry.getJournalEntriesByUser(req.params.userId);
+      const userId = req.header('userid'); // Corrected to 'userid'
+      if (!userId) {
+        return res.status(401).json({ error: 'User ID header is missing' });
+      }
+
+      const entries = await JournalEntry.getJournalEntriesByUser(userId);
       res.status(200).json(entries);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -36,7 +62,7 @@ class JournalEntryController {
    * Retrieve a journal entry by its ID.
    * @param {Object} req - The request object.
    * @param {Object} res - The response object.
-   * @returns {Object} The journal entry.
+   * @returns {Promise<Object>} The journal entry.
    */
   static async getJournalEntryById(req, res) {
     try {
@@ -54,7 +80,7 @@ class JournalEntryController {
    * Update an existing journal entry with new title and content.
    * @param {Object} req - The request object.
    * @param {Object} res - The response object.
-   * @returns {Object} The updated journal entry.
+   * @returns {Promise<Object>} The updated journal entry.
    */
   static async updateJournalEntry(req, res) {
     try {
@@ -73,7 +99,7 @@ class JournalEntryController {
    * Delete a journal entry.
    * @param {Object} req - The request object.
    * @param {Object} res - The response object.
-   * @returns {void}
+   * @returns {Promise<void>}
    */
   static async deleteJournalEntry(req, res) {
     try {
@@ -88,4 +114,4 @@ class JournalEntryController {
   }
 }
 
-module.exports = JournalEntryController;
+export default JournalEntryController;

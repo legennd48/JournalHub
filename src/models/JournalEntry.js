@@ -24,7 +24,7 @@ class JournalEntry {
    * @param {string} title - The title of the journal entry.
    * @param {string} content - The content of the journal entry.
    * @param {ObjectID} authorId - The ID of the author.
-   * @returns {Object} The created journal entry.
+   * @returns {Promise<Object>} The created journal entry.
    */
   static async createJournalEntry(title, content, authorId) {
     const newEntry = new JournalEntry(title, content, authorId);
@@ -35,7 +35,7 @@ class JournalEntry {
   /**
    * Retrieve all journal entries associated with a specific user.
    * @param {ObjectID} userId - The ID of the user.
-   * @returns {Array} The list of journal entries.
+   * @returns {Promise<Array>} The list of journal entries.
    */
   static async getJournalEntriesByUser(userId) {
     const entries = await dbClient.db.collection('journalEntries').find({ authorId: new ObjectID(userId) }).toArray();
@@ -44,9 +44,9 @@ class JournalEntry {
 
   /**
    * Retrieve a journal entry by its ID.
-   * @param {ObjectID} id - The ID of the journal entry.
-   * @returns {Object} The journal entry.
-   * @throws Will throw an error if the ID is invalid.
+   * @param {string} id - The ID of the journal entry.
+   * @returns {Promise<Object|null>} The journal entry, or null if not found.
+   * @throws {Error} Will throw an error if the ID is invalid.
    */
   static async getJournalEntryById(id) {
     if (!ObjectID.isValid(id)) {
@@ -58,11 +58,11 @@ class JournalEntry {
 
   /**
    * Update an existing journal entry with new title and content.
-   * @param {ObjectID} entryId - The ID of the journal entry.
+   * @param {string} entryId - The ID of the journal entry.
    * @param {string} title - The new title of the journal entry.
    * @param {string} content - The new content of the journal entry.
-   * @returns {Object} The updated journal entry.
-   * @throws Will throw an error if the ID is invalid.
+   * @returns {Promise<Object|null>} The updated journal entry, or null if not found.
+   * @throws {Error} Will throw an error if the ID is invalid.
    */
   static async updateJournalEntry(entryId, title, content) {
     if (!ObjectID.isValid(entryId)) {
@@ -78,9 +78,9 @@ class JournalEntry {
 
   /**
    * Delete a journal entry from the database.
-   * @param {ObjectID} entryId - The ID of the journal entry.
-   * @returns {boolean} True if the journal entry was deleted, false otherwise.
-   * @throws Will throw an error if the ID is invalid.
+   * @param {string} entryId - The ID of the journal entry.
+   * @returns {Promise<boolean>} True if the journal entry was deleted, false otherwise.
+   * @throws {Error} Will throw an error if the ID is invalid.
    */
   static async deleteJournalEntry(entryId) {
     if (!ObjectID.isValid(entryId)) {
