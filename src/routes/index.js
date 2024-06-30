@@ -19,6 +19,8 @@ const router = express.Router();
 
 // Endpoint: GET /status
 router.get('/status', AppController.getStatus); // Endpoint to check the status of the application
+router.get('/stats', (req, res) => AppController.getStats(req, res));
+router.get('/user/entries/:id', (req, res) => AppController.getUserEntries(req, res));
 
 // Auth endpoints
 router.post('/login', AuthController.login); // Endpoint to handle user login
@@ -37,4 +39,4 @@ router.get('/profile/:userId', authenticate, getUserProfile); // Add authenticat
 router.put('/profile/:userId', authenticate, updateUserProfile); // Add authenticate middleware
 router.delete('/profile/:userId', authenticate, deleteUserAccount); // Add authenticate middleware
 
-module.exports = router;
+export default router;
