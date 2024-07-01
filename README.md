@@ -236,9 +236,9 @@ JournalHub is licensed under the MIT License. See the [LICENSE](./LICENSE) file 
 ## Authors
 - Abdulrazzaq Liasu (Project lead) [Github](https://github.com/legennd48)
 - Monwabisi Ndlovu (Backend) [Github](https://github.com/Monwabisindlovu)
-- Salami Oluwatosin Adedoyin [Github](https://github.com/LusterPearl)
+- Salami Oluwatosin (Backend) [Github](https://github.com/LusterPearl)
 
-## Related Projects
+## Similar Projects
 
 Here are some related projects that might interest you:
 
